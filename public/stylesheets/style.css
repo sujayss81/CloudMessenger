@@ -1,0 +1,23 @@
+#box{
+  height: 50vh;
+  width: 30%;
+  background-color: #eeeeee;
+  margin: auto;
+  margin-top: 20vh;
+  box-shadow: 2px 2px 2px 2px gray;
+  padding-top: 10vh;
+}
+*{
+  text-align: center;
+}
+input[type="text"],input[type="password"]{
+  width: 90%;
+  margin: auto;
+}
+input[type="submit"], .btn{
+  margin-top: 2vh;
+}
+label{
+  margin-top: 2vh;
+  font-weight: 600;
+}

@@ -1,0 +1,33 @@
+{
+  "name": "cloudmessenger",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "animate.css": "^3.7.2",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "^3.0.2",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "mongodb": "^3.5.5",
+    "morgan": "~1.9.1"
+  },
+  "description": "Messaging Platform Over the internet",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sujayss81/CloudMessenger.git"
+  },
+  "author": "Sujay Shenoy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sujayss81/CloudMessenger/issues"
+  },
+  "homepage": "https://github.com/sujayss81/CloudMessenger#readme"
+}
