@@ -1,9 +1,10 @@
 var createError = require('http-errors');
 var express = require('express');
+var session = require('express-session');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var mongoClient = require("mongodb").MongoClient;
 var logger = require('morgan');
+var ObjectId = require('mongodb').ObjectID;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -18,50 +19,112 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(session({ 
+  secret : 'key',
+  saveUninitialized : true,
+  resave : true
+ }));
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use(body-parser());
 
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 app.use('/users', usersRouter);
+// app.all('*', isauth);
+
 
 // GET
 app.get('/signup',function(req,res){
   res.render('signup');
 });
 
-app.get('/logout/:name', function(req,res){
+app.get('/', function(req, res, next) {
+  console.log("Printing session");
+  console.log(req.session.lid);
+  console.log("Done Printing")
+  if(req.session.lid){
+    res.redirect('/home');
+  }
+  else{
+    res.render('index');
+  }
+});
+
+app.get('/home', function(req,res){
+  if(req.session.lid){
+  var MongoClient = require("mongodb").MongoClient;
+  MongoClient.connect("mongodb://localhost:27017/", function(err, db){
+  var dbs = db.db('messenger');
+  dbs.collection('online').find({}).toArray(function(err,result){
+    var id = req.session.lid;
+    console.log("Session id "+id);
+    dbs.collection('auth').findOne({ _id : ObjectId(id) }, function(err, r){
+    if(err) next(err);
+        res.render('home', { name: r.name, id: ObjectId(r._id), ousers: result });
+      });
+    });
+    });
+  }
+  else{
+    res.redirect('/');
+  }
+});
+
+app.get('/logout/:id', function(req,res,next){
   var MongoClient = require("mongodb").MongoClient;
   MongoClient.connect("mongodb://localhost:27017/", function(err, db){
     if(err) next(err)
     console.log("Database Connected");
     var dbs = db.db('messenger');
-    dbs.collection('online').deleteOne({name:req.params.name}, function(err,r){
+    dbs.collection('online').deleteOne({_id:ObjectId(req.params.id)}, function(err,r){
       if(err) next(err);
+      req.session.destroy(function(err){
+        next(err);
+      });
       res.redirect('/');
     });
   });
 });
 
+app.get('/chatwindow', function(req,res,next){
+  if( req.session.sender && req.session.receiver )
+  {
+    var MongoClient = require("mongodb").MongoClient;
+    MongoClient.connect("mongodb://localhost:27017/", function(err, db){
+      var dbs = db.db('messenger');
+      dbs.collection('online').findOne({ _id: ObjectId(req.session.receiver) }, function(err,r){
+        if(err) next(err);
+        res.render('chatwindow', { name: r.name ,from: req.session.sender, to: req.session.receiver });
+      });
+    });
+  }
+});
+
 // POST
 app.post('/login',function(req,res){
-  var MongoClient = require("mongodb").MongoClient;
-  MongoClient.connect("mongodb://localhost:27017/", function(err, db){
-    if(err) next(err)
-    console.log("Database Connected");
-    var dbs = db.db('messenger');
-    dbs.collection('auth').findOne({ name : req.body.username, pass: req.body.password },function(err,r){
-      if(r){
-        dbs.collection('online').find({}).toArray(function(err,result){
-          dbs.collection('online').insertOne({ name : req.body.username }, function(err){
-            if(err) next(err);
-            res.render('home', { name: req.body.username, ousers: result });
-          });
-        }); 
+  console.log("Printing session");
+  console.log(req.session.lid);
+  console.log("Done Printing")
+  if(req.session.lid){
+    res.redirect('/home');
+  }
+  else{
+    var MongoClient = require("mongodb").MongoClient;
+    MongoClient.connect("mongodb://localhost:27017/", function(err, db){
+      if(err) next(err)
+      console.log("Database Connected");
+      var dbs = db.db('messenger');
+      dbs.collection('auth').findOne({ name : req.body.username, pass: req.body.password },function(err,r){
+        if(r){
+          req.session.lid = r._id;
+          console.log("Session set : "+ req.session.lid);
+          var obj = { _id : r._id, name: r.name };
+          dbs.collection('online').insertOne(obj,function(){}); 
+          res.redirect('/home');
         }
         else
           res.send("Authentication Failed");
       });
-  });
+    });
+  }
 });
 
 app.post('/signup',function(req,res){
@@ -77,6 +140,37 @@ app.post('/signup',function(req,res){
     });
   });
 });
+
+app.post('/chat',function(req,res,next){
+  var receiver = req.body.receiver;
+  if(receiver == 'nos')
+  {
+    res.redirect('/home');
+  }
+  else{
+    console.log("Sender is"+ req.body.sender);
+    console.log("Receiver is" + req.body.receiver);
+    req.session.sender = req.body.sender;
+    req.session.receiver = req.body.receiver;
+    res.redirect('/chatwindow');
+  }
+});
+
+app.post('/message', function(req,res,next){
+  console.log("Message Received\nFrom "+req.body.from+"\nTo "+req.body.to+"\nMessage "+req.body.message);
+  res.redirect('/chatwindow');
+});
+
+// Functions
+
+// var isauth = function (req,res,next){
+//     // if(req.session.lid)
+//     // {
+//     //   res.redirect('/');
+//     // }
+//     console.log("Middleware invoked")
+//     next()
+// }
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,0 +1,12 @@
+body{
+    background-color: #eeeeee;
+}
+.form1{
+    width: 20%;
+    margin: auto;
+    text-align: center;
+    margin-top: 20vh;
+}
+input[type='submit']{
+    margin-top: 3vh;
+}
