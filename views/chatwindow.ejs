@@ -10,7 +10,13 @@
             <div class="recipient">
                 <h4><%=name %></h4>
             </div>
-
+			<div class="messages">
+				<ul>
+					<% messages.forEach(function(res) { %>
+						<li><%= res.message %></li>
+					<% }); %>
+				</ul>
+			</div>
 			<form method="POST" action="/message">
 					<input type="hidden" name="from" value="<%=from %>">
 					<input type="hidden" name="to" value="<%=to %>">

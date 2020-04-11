@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var ObjectId = require('mongodb').ObjectID;
 
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -92,7 +93,10 @@ app.get('/chatwindow', function(req,res,next){
       var dbs = db.db('messenger');
       dbs.collection('online').findOne({ _id: ObjectId(req.session.receiver) }, function(err,r){
         if(err) next(err);
-        res.render('chatwindow', { name: r.name ,from: req.session.sender, to: req.session.receiver });
+        dbs.collection('messages').find({ $or: [ { $and: [ { from: req.session.sender },{ to: req.session.receiver } ] }, { $and: [{ from: req.session.receiver },{to:req.session.sender}] } ] }).toArray(function(er,re){
+          console.log("Printing Messages"+re);
+          res.render('chatwindow', { name: r.name ,from: req.session.sender, to: req.session.receiver, messages : re });
+        });
       });
     });
   }
@@ -158,6 +162,18 @@ app.post('/chat',function(req,res,next){
 
 app.post('/message', function(req,res,next){
   console.log("Message Received\nFrom "+req.body.from+"\nTo "+req.body.to+"\nMessage "+req.body.message);
+  var mongoClient = require("mongodb").MongoClient;
+  mongoClient.connect("mongodb://localhost:27017/", function(err, db){
+    if(err) next(err);
+    var dbs = db.db('messenger');
+    var dateTime = require('node-datetime');
+    var date = dateTime.create();
+    var format = date.format('d-m-Y H-M-S');
+    var obj = { from : req.body.from, to : req.body.to, message : req.body.message , time: format};
+    dbs.collection('messages').insertOne(obj , function(e,r){
+      if(e) next(e);
+    });
+  });
   res.redirect('/chatwindow');
 });
 
