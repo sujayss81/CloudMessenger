@@ -5,17 +5,31 @@
 	<link rel="stylesheet" href="stylesheets/chatwindow.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
 	</head>
+	<script>
+		window.setInterval(function(){
+			
+		}, 1000);
+	</script>
 	<body>
+		<h1 id="test"></h1>
 		<div class="container">
             <div class="recipient">
                 <h4><%=name %></h4>
             </div>
-			<div class="messages">
-				<ul>
+			<div class="messages" onload="scroll" id="mess">
 					<% messages.forEach(function(res) { %>
-						<li><%= res.message %></li>
+						<%if(res.from == from) { %>
+							<div class="mbox right">
+								<!-- <h5><%=res.fname %></h5> -->
+								<p><%= res.message %></p>
+							</div>
+						<%} else {%>
+							<div class="mbox left">
+								<!-- <h5><%=res.fname %></h5> -->
+								<p><%= res.message %></p>
+							</div>
+						<% } %>			
 					<% }); %>
-				</ul>
 			</div>
 			<form method="POST" action="/message">
 					<input type="hidden" name="from" value="<%=from %>">
@@ -31,7 +45,10 @@
 
 
 
-
+	<script>
+		var objDiv = document.getElementById("mess");
+		objDiv.scrollTop = objDiv.scrollHeight;
+	</script>
 	
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>

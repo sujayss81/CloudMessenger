@@ -102,6 +102,10 @@ app.get('/chatwindow', function(req,res,next){
   }
 });
 
+app.get('/online',function(req,res){
+  res.send("Sent from server")
+});
+
 // POST
 app.post('/login',function(req,res){
   console.log("Printing session");
@@ -169,9 +173,13 @@ app.post('/message', function(req,res,next){
     var dateTime = require('node-datetime');
     var date = dateTime.create();
     var format = date.format('d-m-Y H-M-S');
-    var obj = { from : req.body.from, to : req.body.to, message : req.body.message , time: format};
-    dbs.collection('messages').insertOne(obj , function(e,r){
-      if(e) next(e);
+    dbs.collection('auth').findOne({_id:ObjectId(req.body.from)}, function(er,re){
+      if(er) next(er);
+      var obj = { from : req.body.from,fname: re.name , to : req.body.to, message : req.body.message , time: format};
+      console.log("Obj : "+obj);
+      dbs.collection('messages').insertOne(obj , function(e,r){
+        if(e) next(e);
+      });
     });
   });
   res.redirect('/chatwindow');

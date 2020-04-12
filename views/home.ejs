@@ -5,7 +5,19 @@
 	<link rel="stylesheet" href="stylesheets/home.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
 	</head>
+	<script>
+		window.setInterval(function(){
+			xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById("demo").innerHTML = this.responseText;
+			}
+			};
+			xhttp.open("GET", "/online", true);
+			xhttp.send();
+		}, 1000);
+	</script>
 	<body>
+		<h1 id="demo"></h1>
 		<h1>Hello <%=name %></h1>
 		<a href="/logout/<%=id %>">Logout</a>
 		<!-- <ul>
