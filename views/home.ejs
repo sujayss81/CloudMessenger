@@ -7,9 +7,24 @@
 	</head>
 	<script>
 		window.setInterval(function(){
+			var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
-				document.getElementById("demo").innerHTML = this.responseText;
+				var a = JSON.parse(this.responseText);
+				document.getElementById('ousers').innerHTML = 
+					""
+					;
+				document.getElementById('ousers').innerHTML += 
+					"<option value='nos'>--</option>"
+					;
+				for(i=0;i<a.length;i++){
+					if(a[i]._id == "<%=cuser %>"){
+						continue;
+					}
+					document.getElementById('ousers').innerHTML += 
+					"<option value='"+a[i]._id+"'>"+a[i].name+"</option>"
+					;
+				}	
 			}
 			};
 			xhttp.open("GET", "/online", true);
@@ -17,25 +32,19 @@
 		}, 1000);
 	</script>
 	<body>
-		<h1 id="demo"></h1>
 		<h1>Hello <%=name %></h1>
 		<a href="/logout/<%=id %>">Logout</a>
-		<!-- <ul>
-			<% ousers.forEach(function(res) { %>
-				<li><%= res.name %></li>
-			<% }); %>
-		  </ul> -->
 		<div class="form1">
 			<form method="POST" action="/chat">
 				<label>Choose Online Users from the list below</label>
 				<input type="hidden" value="<%=id %>" name="sender">
-				<select name="receiver" class="form-control">
-					<option value="nos">--</option>
-					<% ousers.forEach(function(res) { %>
+				<select name="receiver" class="form-control" id="ousers">
+					<!-- <option value="nos">--</option> -->
+					<!-- <% ousers.forEach(function(res) { %>
 						<% if(!id.equals(res._id)) { %>
 							<option value="<%=res._id %>"><%= res.name %></option>
 						<%}%>
-					<% }); %>
+					<% }); %> -->
 				</select>
 				<input type="submit" class="btn btn-primary" value="Start Messaging">
 			</form>

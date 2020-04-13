@@ -59,7 +59,7 @@ app.get('/home', function(req,res){
     console.log("Session id "+id);
     dbs.collection('auth').findOne({ _id : ObjectId(id) }, function(err, r){
     if(err) next(err);
-        res.render('home', { name: r.name, id: ObjectId(r._id), ousers: result });
+        res.render('home', { name: r.name ,id: ObjectId(r._id), ousers: result,cuser:r._id});
       });
     });
     });
@@ -103,7 +103,35 @@ app.get('/chatwindow', function(req,res,next){
 });
 
 app.get('/online',function(req,res){
-  res.send("Sent from server")
+  var MongoClient = require("mongodb").MongoClient;
+  MongoClient.connect("mongodb://localhost:27017/", function(err, db){
+    var dbs = db.db('messenger');
+    dbs.collection('online').count(function(e,r){
+      if(!req.session.ousers){
+        req.session.ousers = r;
+        dbs.collection('online').find({}).toArray(function(err,re){
+          console.log("Result sent");
+          re.lid = req.session.lid;
+          res.send(re);
+        });
+      }
+      else if(req.session.ousers != r)
+      {
+        dbs.collection('online').find({}).toArray(function(err,re){
+          console.log("Result sent");
+          req.session.ousers = r;
+          re.lid = req.session.lid;
+          res.send(re);
+        });
+      }
+      else{
+        res.status(500);
+        res.end();
+      } 
+      console.log("Count"+r);
+    });
+    
+  });
 });
 
 // POST
