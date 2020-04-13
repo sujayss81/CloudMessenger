@@ -6,9 +6,44 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
 	</head>
 	<script>
+		var pcount;
 		window.setInterval(function(){
-			
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var a = JSON.parse(this.responseText);
+				if(a.length == pcount){
+					return;
+				}
+				pcount = a.length;
+				for(i=0;i<a.length;i++){
+					if(a[i].from == "<%=from%>"){
+						document.getElementById("mess").innerHTML += 
+							"<div class='mbox right'><p>"+a[i].message+"</p></div>"
+						;
+					}
+					else{
+						document.getElementById("mess").innerHTML += 
+							"<div class='mbox left'><p>"+a[i].message+"</p></div>"
+						;
+					}
+				}
+				var objDiv = document.getElementById("mess");
+				objDiv.scrollTop = objDiv.scrollHeight;
+			}
+			};
+			xhttp.open("GET", "/getm", true);
+			xhttp.send();
 		}, 1000);
+	</script>
+	<script>
+		function sendM(){
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("POST","/message");
+			var form = document.getElementById('mform');
+			var formData = new FormData(form);
+			xhttp.send(formData);
+		}
 	</script>
 	<body>
 		<h1 id="test"></h1>
@@ -16,26 +51,24 @@
             <div class="recipient">
                 <h4><%=name %></h4>
             </div>
-			<div class="messages" onload="scroll" id="mess">
-					<% messages.forEach(function(res) { %>
+			<div class="messages" id="mess">
+					<!-- <% messages.forEach(function(res) { %>
 						<%if(res.from == from) { %>
 							<div class="mbox right">
-								<!-- <h5><%=res.fname %></h5> -->
 								<p><%= res.message %></p>
 							</div>
 						<%} else {%>
 							<div class="mbox left">
-								<!-- <h5><%=res.fname %></h5> -->
 								<p><%= res.message %></p>
 							</div>
 						<% } %>			
-					<% }); %>
+					<% }); %> -->
 			</div>
-			<form method="POST" action="/message">
+			<form id="mform">
 					<input type="hidden" name="from" value="<%=from %>">
 					<input type="hidden" name="to" value="<%=to %>">
                     <input type="text" class="form-control" name="message">
-                    <input type="submit" class="btn btn-primary" value="send">  
+                    <button class="btn btn-primary" onclick="sendM()">Send</button>  
             </form>
         </div>
 		

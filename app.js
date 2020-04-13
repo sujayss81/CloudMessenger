@@ -18,7 +18,7 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({ 
   secret : 'key',
@@ -132,6 +132,17 @@ app.get('/online',function(req,res){
     });
     
   });
+});
+
+app.get('/getm',function(req,res){
+  var MongoClient = require("mongodb").MongoClient;
+    MongoClient.connect("mongodb://localhost:27017/", function(err, db){
+      var dbs = db.db('messenger');
+
+      dbs.collection('messages').find({ $or: [ { $and: [ { from: req.session.sender },{ to: req.session.receiver } ] }, { $and: [{ from: req.session.receiver },{to:req.session.sender}] } ] }).toArray(function(er,re){
+        res.send(re);
+      });
+    });
 });
 
 // POST
