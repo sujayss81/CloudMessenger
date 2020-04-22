@@ -86,6 +86,10 @@ app.get('/logout/:id', function(req,res,next){
 });
 
 app.get('/chatwindow', function(req,res,next){
+  if(!req.session.lid)
+  {
+    res.redirect("/")
+  }
   if( req.session.sender && req.session.receiver )
   {
     var MongoClient = require("mongodb").MongoClient;
@@ -100,6 +104,9 @@ app.get('/chatwindow', function(req,res,next){
       });
     });
   }
+  else{
+    res.redirect("/home")
+  }
 });
 
 app.get('/online',function(req,res){
@@ -107,28 +114,11 @@ app.get('/online',function(req,res){
   MongoClient.connect("mongodb://localhost:27017/", function(err, db){
     var dbs = db.db('messenger');
     dbs.collection('online').count(function(e,r){
-      if(!req.session.ousers){
-        req.session.ousers = r;
         dbs.collection('online').find({}).toArray(function(err,re){
-          console.log("Result sent");
           re.lid = req.session.lid;
           res.send(re);
         });
-      }
-      else if(req.session.ousers != r)
-      {
-        dbs.collection('online').find({}).toArray(function(err,re){
-          console.log("Result sent");
-          req.session.ousers = r;
-          re.lid = req.session.lid;
-          res.send(re);
-        });
-      }
-      else{
-        res.status(500);
-        res.end();
-      } 
-      console.log("Count"+r);
+        console.log("Count"+r);
     });
     
   });

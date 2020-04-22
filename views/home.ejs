@@ -6,11 +6,16 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
 	</head>
 	<script>
+		var pcount;
 		window.setInterval(function(){
 			var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				var a = JSON.parse(this.responseText);
+				if(a.length == pcount){
+					return;
+				}
+				pcount = a.length;
 				document.getElementById('ousers').innerHTML = 
 					""
 					;
@@ -29,7 +34,7 @@
 			};
 			xhttp.open("GET", "/online", true);
 			xhttp.send();
-		}, 1000);
+		}, 500);
 	</script>
 	<body>
 		<h1>Hello <%=name %></h1>
