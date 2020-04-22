@@ -41,7 +41,9 @@
 			var xhttp = new XMLHttpRequest();
 			xhttp.open("POST","/message");
 			var form = document.getElementById('mform');
-			var formData = new FormData(form);
+			console.log(form)
+			var formData = new FormData(form)
+			console.log(formData);
 			xhttp.send(formData);
 		}
 	</script>
@@ -64,11 +66,11 @@
 						<% } %>			
 					<% }); %> -->
 			</div>
-			<form id="mform">
+			<form id="mform" action="/message" method="POST" autocomplete="off">
 					<input type="hidden" name="from" value="<%=from %>">
 					<input type="hidden" name="to" value="<%=to %>">
                     <input type="text" class="form-control" name="message">
-                    <button class="btn btn-primary" onclick="sendM()">Send</button>  
+                    <input type="submit" class="btn btn-primary" value="Send">
             </form>
         </div>
 		
