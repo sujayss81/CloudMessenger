@@ -5,7 +5,17 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var ObjectId = require('mongodb').ObjectID;
+var MongoClient = require("mongodb").MongoClient;
 
+var dbs;
+MongoClient.connect("mongodb://localhost:27017/", function(err, db){
+  if(err) {
+    console.log("Database Connection error")
+    next(err)
+  }
+  dbs = db.db('messenger');
+  console.log("Database Connected")
+});
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -38,9 +48,6 @@ app.get('/signup',function(req,res){
 });
 
 app.get('/', function(req, res, next) {
-  console.log("Printing session");
-  console.log(req.session.lid);
-  console.log("Done Printing")
   if(req.session.lid){
     res.redirect('/home');
   }
@@ -51,17 +58,12 @@ app.get('/', function(req, res, next) {
 
 app.get('/home', function(req,res){
   if(req.session.lid){
-  var MongoClient = require("mongodb").MongoClient;
-  MongoClient.connect("mongodb://localhost:27017/", function(err, db){
-  var dbs = db.db('messenger');
-  dbs.collection('online').find({}).toArray(function(err,result){
+    dbs.collection('online').find({}).toArray(function(err,result){
     var id = req.session.lid;
-    console.log("Session id "+id);
     dbs.collection('auth').findOne({ _id : ObjectId(id) }, function(err, r){
     if(err) next(err);
         res.render('home', { name: r.name ,id: ObjectId(r._id), ousers: result,cuser:r._id});
       });
-    });
     });
   }
   else{
@@ -70,11 +72,6 @@ app.get('/home', function(req,res){
 });
 
 app.get('/logout/:id', function(req,res,next){
-  var MongoClient = require("mongodb").MongoClient;
-  MongoClient.connect("mongodb://localhost:27017/", function(err, db){
-    if(err) next(err)
-    console.log("Database Connected");
-    var dbs = db.db('messenger');
     dbs.collection('online').deleteOne({_id:ObjectId(req.params.id)}, function(err,r){
       if(err) next(err);
       req.session.destroy(function(err){
@@ -82,7 +79,6 @@ app.get('/logout/:id', function(req,res,next){
       });
       res.redirect('/');
     });
-  });
 });
 
 app.get('/chatwindow', function(req,res,next){
@@ -92,17 +88,12 @@ app.get('/chatwindow', function(req,res,next){
   }
   if( req.session.sender && req.session.receiver )
   {
-    var MongoClient = require("mongodb").MongoClient;
-    MongoClient.connect("mongodb://localhost:27017/", function(err, db){
-      var dbs = db.db('messenger');
       dbs.collection('online').findOne({ _id: ObjectId(req.session.receiver) }, function(err,r){
         if(err) next(err);
         dbs.collection('messages').find({ $or: [ { $and: [ { from: req.session.sender },{ to: req.session.receiver } ] }, { $and: [{ from: req.session.receiver },{to:req.session.sender}] } ] }).toArray(function(er,re){
-          console.log("Printing Messages"+re);
           res.render('chatwindow', { name: r.name ,from: req.session.sender, to: req.session.receiver, messages : re });
         });
       });
-    });
   }
   else{
     res.redirect("/home")
@@ -110,49 +101,27 @@ app.get('/chatwindow', function(req,res,next){
 });
 
 app.get('/online',function(req,res){
-  var MongoClient = require("mongodb").MongoClient;
-  MongoClient.connect("mongodb://localhost:27017/", function(err, db){
-    var dbs = db.db('messenger');
-    dbs.collection('online').count(function(e,r){
         dbs.collection('online').find({}).toArray(function(err,re){
           re.lid = req.session.lid;
           res.send(re);
         });
-        console.log("Count"+r);
-    });
-    
-  });
 });
 
 app.get('/getm',function(req,res){
-  var MongoClient = require("mongodb").MongoClient;
-    MongoClient.connect("mongodb://localhost:27017/", function(err, db){
-      var dbs = db.db('messenger');
-
       dbs.collection('messages').find({ $or: [ { $and: [ { from: req.session.sender },{ to: req.session.receiver } ] }, { $and: [{ from: req.session.receiver },{to:req.session.sender}] } ] }).toArray(function(er,re){
         res.send(re);
       });
-    });
 });
 
 // POST
 app.post('/login',function(req,res){
-  console.log("Printing session");
-  console.log(req.session.lid);
-  console.log("Done Printing")
   if(req.session.lid){
     res.redirect('/home');
   }
   else{
-    var MongoClient = require("mongodb").MongoClient;
-    MongoClient.connect("mongodb://localhost:27017/", function(err, db){
-      if(err) next(err)
-      console.log("Database Connected");
-      var dbs = db.db('messenger');
       dbs.collection('auth').findOne({ name : req.body.username, pass: req.body.password },function(err,r){
         if(r){
           req.session.lid = r._id;
-          console.log("Session set : "+ req.session.lid);
           var obj = { _id : r._id, name: r.name };
           dbs.collection('online').insertOne(obj,function(){}); 
           res.redirect('/home');
@@ -160,22 +129,15 @@ app.post('/login',function(req,res){
         else
           res.send("Authentication Failed");
       });
-    });
   }
 });
 
 app.post('/signup',function(req,res){
-  var mongoClient = require("mongodb").MongoClient;
-  mongoClient.connect("mongodb://localhost:27017/", function(err, db){
-    if(err) next(err)
-    console.log("Database Connected");
     var obj = { name: req.body.username, pass: req.body.password };
-    var dbs = db.db('messenger');
     dbs.collection('auth').insertOne(obj,function(err,r){
       if(err) next(err)
       res.send("Successfully Registered");
     });
-  });
 });
 
 app.post('/chat',function(req,res,next){
@@ -185,8 +147,6 @@ app.post('/chat',function(req,res,next){
     res.redirect('/home');
   }
   else{
-    console.log("Sender is"+ req.body.sender);
-    console.log("Receiver is" + req.body.receiver);
     req.session.sender = req.body.sender;
     req.session.receiver = req.body.receiver;
     res.redirect('/chatwindow');
@@ -195,22 +155,16 @@ app.post('/chat',function(req,res,next){
 
 app.post('/message', function(req,res,next){
   console.log("Message Received\nFrom "+req.body.from+"\nTo "+req.body.to+"\nMessage "+req.body.message);
-  var mongoClient = require("mongodb").MongoClient;
-  mongoClient.connect("mongodb://localhost:27017/", function(err, db){
-    if(err) next(err);
-    var dbs = db.db('messenger');
     var dateTime = require('node-datetime');
     var date = dateTime.create();
     var format = date.format('d-m-Y H-M-S');
     dbs.collection('auth').findOne({_id:ObjectId(req.body.from)}, function(er,re){
       if(er) next(er);
       var obj = { from : req.body.from,fname: re.name , to : req.body.to, message : req.body.message , time: format};
-      console.log("Obj : "+obj);
       dbs.collection('messages').insertOne(obj , function(e,r){
         if(e) next(e);
       });
     });
-  });
   res.redirect('/chatwindow');
 });
 
