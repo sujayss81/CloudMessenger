@@ -113,6 +113,46 @@ app.get('/getm',function(req,res){
       });
 });
 
+app.get('/friends',function(req,res){
+  if(!req.session.lid)
+  {
+    res.redirect("/")
+  }
+  res.render("friends");
+});
+
+app.get('/showfriends/:name',function(req,res){
+  console.log("Name="+req.params.name);
+  dbs.collection('auth').find({name: { $regex: "^"+req.params.name }}).toArray(function(err,re){
+    re.lid = req.session.lid;
+    res.send(re);
+  });
+});
+
+app.get('/addfriend/:id',function(req,res,next){
+  var obj = { from : req.session.lid,fname : req.session.lname ,to : req.params.id }
+  dbs.collection("pendingf").insertOne(obj,function(err,r){
+    if(err) next(err)
+    res.send("Added")
+  });
+});
+
+app.get('/pendingf',function(req,res,next){
+  dbs.collection('pendingf').find({to: req.session.lid}).toArray(function(err,r){
+    console.log("Results")
+    console.log(r)
+    res.render("pendingf", { result: r });
+  })
+});
+
+app.get('/cadd/:id',function(req,res,next){
+  var obj = { f1: req.session.lid, f2: req.params.id }
+  dbs.collection('friends').insertOne(obj,function(err,r){
+    if(err) next(err)
+    dbs.collection('pendingf').deleteOne({ from: req.params.id, to: req.session.lid }, function(){})
+    res.send("Friend Added")
+  })
+})
 // POST
 app.post('/login',function(req,res){
   if(req.session.lid){
@@ -122,6 +162,7 @@ app.post('/login',function(req,res){
       dbs.collection('auth').findOne({ name : req.body.username, pass: req.body.password },function(err,r){
         if(r){
           req.session.lid = r._id;
+          req.session.lname = r.name;
           var obj = { _id : r._id, name: r.name };
           dbs.collection('online').insertOne(obj,function(){}); 
           res.redirect('/home');

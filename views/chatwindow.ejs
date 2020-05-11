@@ -4,7 +4,42 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 	<link rel="stylesheet" href="stylesheets/chatwindow.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+
 	</head>
+	<body>
+		<h1 id="test"></h1>
+		<div class="container">
+            <div class="recipient">
+                <h4><%=name %></h4>
+            </div>
+			<div class="messages" id="mess">
+			</div>
+			<form id="mform" action="/message" method="POST" autocomplete="off">
+					<input type="hidden" name="from" value="<%=from %>">
+					<input type="hidden" name="to" value="<%=to %>">
+                    <input type="text" class="form-control" name="message" id="ipbox">
+                    <input type="submit" class="btn btn-primary" value="Send">
+            </form>
+        </div>
+		
+
+
+
+
+
+	
+	<script>
+		var objDiv = document.getElementById("mess");
+		objDiv.scrollTop = objDiv.scrollHeight;
+	</script>
+	
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+	<script
+	src="https://code.jquery.com/jquery-3.4.1.min.js"
+	integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+	crossorigin="anonymous"></script>
 	<script>
 		var pcount;
 		window.setInterval(function(){
@@ -38,57 +73,30 @@
 		}, 1000);
 	</script>
 	<script>
-		function sendM(){
-			var xhttp = new XMLHttpRequest();
-			xhttp.open("POST","/message");
-			var form = document.getElementById('mform');
-			console.log(form)
-			var formData = new FormData(form)
-			console.log(formData);
-			xhttp.send(formData);
-		}
+		// function sendM(){
+		// 	var xhttp = new XMLHttpRequest();
+		// 	xhttp.open("POST","/message");
+		// 	var form = document.getElementById('mform');
+		// 	console.log(form)
+		// 	var formData = new FormData(form)
+		// 	console.log(formData);
+		// 	xhttp.send(formData);
+		// }
+		$(document).on('submit','#mform',function(e){
+			e.preventDefault();
+			var form = $('#mform');
+			var url = $('#mform').attr('action');
+			console.log("Here");
+			console.log(url);
+			$.ajax({
+				type:'POST',
+				url: url,
+				data: form.serialize(),
+				success: console.log("Submitted")
+			});
+			form[0].reset();
+		});
 	</script>
-	<body>
-		<h1 id="test"></h1>
-		<div class="container">
-            <div class="recipient">
-                <h4><%=name %></h4>
-            </div>
-			<div class="messages" id="mess">
-					<!-- <% messages.forEach(function(res) { %>
-						<%if(res.from == from) { %>
-							<div class="mbox right">
-								<p><%= res.message %></p>
-							</div>
-						<%} else {%>
-							<div class="mbox left">
-								<p><%= res.message %></p>
-							</div>
-						<% } %>			
-					<% }); %> -->
-			</div>
-			<form id="mform" action="/message" method="POST" autocomplete="off">
-					<input type="hidden" name="from" value="<%=from %>">
-					<input type="hidden" name="to" value="<%=to %>">
-                    <input type="text" class="form-control" name="message">
-                    <input type="submit" class="btn btn-primary" value="Send">
-            </form>
-        </div>
-		
-
-
-
-
-
-
-	<script>
-		var objDiv = document.getElementById("mess");
-		objDiv.scrollTop = objDiv.scrollHeight;
-	</script>
-	
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 	</body>
 </html>
 
