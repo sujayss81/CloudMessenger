@@ -3,6 +3,7 @@
 	<head>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 	<link rel="stylesheet" href="stylesheets/home.css">
+	<link rel="stylesheet" href="libs/fontawesome/css/fontawesome.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
 	</head>
 	<script>
@@ -37,24 +38,45 @@
 		}, 500);
 	</script>
 	<body>
-		<h1>Hello <%=name %></h1>
+		<div class="mynav">
+			<h1>Cloud Messenger</h1>
+		</div>
+		<div class="sidemenu">
+			<a href="#"><i class="fas fa-bars navbtn toggle"></i></a>
+			<a href="#"><i class="fas fa-times navbtn cross toggler"></i></a>
+			<div class="smitems">
+				<div class="profile toggler">
+					<i class="fas fa-user-alt"></i>
+					<h1 class="uname">Hello <%=name %></h1>
+				</div>
+				<div class="toggler logout">
+					<a href="/logout/<%=id %>">Logout</a>
+				</div>
+			</div>
+		</div>
+		<div class="content">
+			<h3>Online Users</h3>
+			<div class="form1">
+				<form method="POST" action="/chat">
+					<label>Choose Online Users from the list below</label>
+					<input type="hidden" value="<%=id %>" name="sender">
+					<select name="receiver" class="form-control" id="ousers">
+					</select>
+					<input type="submit" class="btn btn-danger" value="Start Messaging">
+				</form>
+			</div>
+		</div>
+		<!-- <h1>Hello <%=name %></h1>
 		<a href="/logout/<%=id %>">Logout</a>
-		<a href="/friends">Friends</a>
 		<div class="form1">
 			<form method="POST" action="/chat">
 				<label>Choose Online Users from the list below</label>
 				<input type="hidden" value="<%=id %>" name="sender">
 				<select name="receiver" class="form-control" id="ousers">
-					<!-- <option value="nos">--</option> -->
-					<!-- <% ousers.forEach(function(res) { %>
-						<% if(!id.equals(res._id)) { %>
-							<option value="<%=res._id %>"><%= res.name %></option>
-						<%}%>
-					<% }); %> -->
 				</select>
 				<input type="submit" class="btn btn-primary" value="Start Messaging">
 			</form>
-		</div>
+		</div> -->
 		
 
 
@@ -67,6 +89,8 @@
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+	<script src="libs/fontawesome/js/all.js"></script>
+	<script src="javascripts/home.js"></script>
 	</body>
 </html>
 

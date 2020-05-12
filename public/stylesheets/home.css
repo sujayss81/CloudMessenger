@@ -1,12 +1,85 @@
 body{
     background-color: #eeeeee;
+    letter-spacing: 2px;
 }
 .form1{
-    width: 20%;
+    width: 24%;
     margin: auto;
     text-align: center;
-    margin-top: 20vh;
+    margin-top: 5vh;
 }
 input[type='submit']{
     margin-top: 3vh;
+}
+.mynav{
+    position: relative;
+    background-color: red;
+    width: 100%;
+    height: 8vh;
+    font-size: 2em;
+}
+.fa-bars{
+    position: absolute;
+    left: 20px;
+    top: 10px;
+}
+a{
+    text-decoration: none;
+    color: black;
+}
+a:hover{
+    color: black;
+}
+.sidemenu{
+    font-size: 2em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: yellow;
+    width: 5%;
+    height: 100vh;
+    transition: width ease-in-out 0.5s;
+}
+h1{
+    text-align: center;
+    color: #ffffff;
+}
+.smitems{
+    position: absolute;
+    top: 10vh;
+    left: 20%;
+    margin: auto;
+}
+.profile{
+    text-align: center;
+    font-size: 5em;
+}
+.uname{
+    color: black;
+}
+.toggler{
+    display: none;
+}
+.toggle{
+    display: block;
+}
+.cross{
+    position: absolute;
+    right: 10%;
+    top: 5%;
+}
+.logout{
+    position: relative;
+    font-weight: 600;
+    top: 30vh;
+}
+.logout a{
+    text-decoration: none;
+}
+.content{
+    padding-top: 10vh;
+    margin: auto;
+}
+h3{
+    text-align: center;
 }

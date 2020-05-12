@@ -113,37 +113,37 @@ app.get('/getm',function(req,res){
       });
 });
 
-app.get('/friends',function(req,res){
-  if(!req.session.lid)
-  {
-    res.redirect("/")
-  }
-  res.render("friends");
-});
+// app.get('/friends',function(req,res){
+//   if(!req.session.lid)
+//   {
+//     res.redirect("/")
+//   }
+//   res.render("friends");
+// });
 
-app.get('/showfriends/:name',function(req,res){
-  console.log("Name="+req.params.name);
-  dbs.collection('auth').find({name: { $regex: "^"+req.params.name }}).toArray(function(err,re){
-    re.lid = req.session.lid;
-    res.send(re);
-  });
-});
+// app.get('/showfriends/:name',function(req,res){
+//   console.log("Name="+req.params.name);
+//   dbs.collection('auth').find({name: { $regex: "^"+req.params.name }}).toArray(function(err,re){
+//     re.lid = req.session.lid;
+//     res.send(re);
+//   });
+// });
 
-app.get('/addfriend/:id',function(req,res,next){
-  var obj = { from : req.session.lid,fname : req.session.lname ,to : req.params.id }
-  dbs.collection("pendingf").insertOne(obj,function(err,r){
-    if(err) next(err)
-    res.send("Added")
-  });
-});
+// app.get('/addfriend/:id',function(req,res,next){
+//   var obj = { from : req.session.lid,fname : req.session.lname ,to : req.params.id }
+//   dbs.collection("pendingf").insertOne(obj,function(err,r){
+//     if(err) next(err)
+//     res.send("Added")
+//   });
+// });
 
-app.get('/pendingf',function(req,res,next){
-  dbs.collection('pendingf').find({to: req.session.lid}).toArray(function(err,r){
-    console.log("Results")
-    console.log(r)
-    res.render("pendingf", { result: r });
-  })
-});
+// app.get('/pendingf',function(req,res,next){
+//   dbs.collection('pendingf').find({to: req.session.lid}).toArray(function(err,r){
+//     console.log("Results")
+//     console.log(r)
+//     res.render("pendingf", { result: r });
+//   })
+// });
 
 app.get('/cadd/:id',function(req,res,next){
   var obj = { f1: req.session.lid, f2: req.params.id }
