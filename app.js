@@ -177,7 +177,7 @@ app.post('/signup',function(req,res){
     var obj = { name: req.body.username, pass: req.body.password };
     dbs.collection('auth').insertOne(obj,function(err,r){
       if(err) next(err)
-      res.send("Successfully Registered");
+      res.send("<h1>Successfully Registered</h1><a href='/'>Sign In</a>");
     });
 });
 

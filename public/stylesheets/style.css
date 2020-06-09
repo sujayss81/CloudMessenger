@@ -1,7 +1,7 @@
 #box{
   height: 50vh;
   width: 30%;
-  background-color: #eeeeee;
+  background-color: #ff5151;
   margin: auto;
   margin-top: 20vh;
   box-shadow: 2px 2px 2px 2px gray;
@@ -19,5 +19,6 @@ input[type="submit"], .btn{
 }
 label{
   margin-top: 2vh;
+  color: white;
   font-weight: 600;
 }
